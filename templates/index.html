@@ -2,74 +2,140 @@
 <html>
 <head>
     <title>Vaccine Hesitancy Predictor</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+        }
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 30px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        label {
+            font-weight: bold;
+        }
+        select, input {
+            padding: 8px;
+            font-size: 14px;
+        }
+        button {
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .result {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: #222;
+        }
+        .message {
+            text-align: center;
+            margin-top: 10px;
+            color: #555;
+        }
+    </style>
 </head>
 <body>
+<div class="container">
     <h2>Vaccine Hesitancy Predictor</h2>
     <form method="post" action="/predict">
         <label>Age:</label>
-        <input type="number" name="age" required><br>
+        <input type="number" name="age" required placeholder="Enter age">
 
         <label>Sex:</label>
         <select name="sex" required>
+            <option value="" disabled selected>Select sex</option>
             <option value="Male">Male</option>
             <option value="Female">Female</option>
-        </select><br>
+        </select>
 
         <label>Marital Status:</label>
         <select name="marital_status" required>
+            <option value="" disabled selected>Select marital status</option>
             <option value="Single">Single</option>
             <option value="Married">Married</option>
-        </select><br>
+        </select>
 
         <label>Place:</label>
         <select name="place" required>
+            <option value="" disabled selected>Select place</option>
             <option value="Urban">Urban</option>
             <option value="Rural">Rural</option>
-        </select><br>
+        </select>
 
         <label>Education (1=Yes, 2=No):</label>
         <select name="education" required>
+            <option value="" disabled selected>Select education</option>
             <option value="1">Yes</option>
             <option value="2">No</option>
-        </select><br>
+        </select>
 
         <label>Qualification:</label>
         <select name="qualification" required>
+            <option value="" disabled selected>Select qualification</option>
             <option value="1">Primary</option>
             <option value="2">Secondary</option>
             <option value="3">Higher Secondary</option>
             <option value="4">Tertiary</option>
-        </select><br>
+        </select>
 
         <label>Job:</label>
         <select name="job" required>
+            <option value="" disabled selected>Select job</option>
             <option value="1">Daily Wager</option>
             <option value="2">Housewife</option>
             <option value="3">Student</option>
             <option value="4">Professional (Senior)</option>
             <option value="5">Professional (Junior)</option>
             <option value="6">Business</option>
-        </select><br>
+        </select>
 
         <label>Job Status:</label>
         <select name="jobst" required>
+            <option value="" disabled selected>Select job status</option>
             <option value="1">Working</option>
             <option value="2">Retired/Not Working</option>
-        </select><br>
+        </select>
 
         <label>Children:</label>
         <select name="child" required>
+            <option value="" disabled selected>Select number of children</option>
             <option value="1">1</option>
             <option value="2">2</option>
             <option value="3">More than 2</option>
-        </select><br>
+        </select>
 
         <button type="submit">Predict</button>
     </form>
 
     {% if result %}
-        <h3>{{ result }}</h3>
-        <p>{{ message }}</p>
+        <div class="result">{{ result }}</div>
+        <div class="message">{{ message }}</div>
     {% endif %}
+</div>
 </body>
 </html>
