@@ -2,40 +2,14 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 import joblib
 
-# Load model & encoders
-clf = joblib.load("vaccine_model.pkl")
-le_sex = joblib.load("le_sex.pkl")
-le_marital = joblib.load("le_marital.pkl")
-le_place = joblib.load("le_place.pkl")
-
 app = FastAPI(
-    title="Vaccine Hesitancy Prediction API",
-    description="""
-    🌟 This API predicts whether an individual is **Vaccine Hesitant** or **Vaccine Confident**
-    based on demographic and socioeconomic factors.
-
-    🔷 Use the `/predict` endpoint to submit the following fields:
-    - `age`: Age of the person
-    - `sex`: Gender (e.g., Male, Female)
-    - `marital_status`: Marital Status (e.g., Single, Married)
-    - `place`: Place of residence (e.g., Urban, Rural)
-    - `edu`: Education level
-    - `qua`: Qualification level
-    - `job`: Job level
-    - `jobst`: Job status
-    - `child`: Number of children
-
-    ✅ Returns: Vaccine Hesitant or Vaccine Confident
-    """,
-    version="1.0.0",
-    contact={
-        "name": "Tahir",
-        "email": "md.a.tahir@gmail.com",
-    },
-    docs_url="/",  # Swagger UI directly at root
+    title="Vaccine Hesitancy Predictor by Tahir",
+    description="A FastAPI app to predict vaccine hesitancy based on demographic inputs.",
+    version="1.0"
 )
 
-class UserInput(BaseModel):
+# Define input schema
+class PredictionInput(BaseModel):
     age: int
     sex: str
     marital_status: str
@@ -46,35 +20,38 @@ class UserInput(BaseModel):
     jobst: int
     child: int
 
-@app.get("/health", tags=["Health Check"])
-def health():
-    """
-    ✅ Check if the API is running.
-    """
-    return {"status": "✅ API is running", "version": "1.0.0"}
+# Load model and encoders
+clf = joblib.load("vaccine_model.pkl")
+le_sex = joblib.load("le_sex.pkl")
+le_marital = joblib.load("le_marital.pkl")
+le_place = joblib.load("le_place.pkl")
 
-@app.post("/predict", tags=["Prediction"])
-def predict(data: UserInput):
-    """
-    🔷 Predict vaccine hesitancy based on user inputs.
-    """
+@app.get("/")
+def read_root():
+    return {"message": "Vaccine Hesitancy Predictor API by Tahir is up and running."}
+
+@app.post("/predict")
+def predict(input: PredictionInput):
     try:
-        row = [[
-            data.age,
-            le_sex.transform([data.sex.capitalize()])[0],
-            le_marital.transform([data.marital_status.capitalize()])[0],
-            le_place.transform([data.place.capitalize()])[0],
-            data.edu,
-            data.qua,
-            data.job,
-            data.jobst,
-            data.child
+        # Prepare input data
+        input_data = [[
+            input.age,
+            le_sex.transform([input.sex])[0],
+            le_marital.transform([input.marital_status])[0],
+            le_place.transform([input.place])[0],
+            input.edu,
+            input.qua,
+            input.job,
+            input.jobst,
+            input.child
         ]]
-        pred = clf.predict(row)[0]
-        result = "Vaccine Hesitant" if pred == 1 else "Vaccine Confident"
-        return {
-            "prediction": result,
-            "input": data.dict()
-        }
+
+        # Predict
+        prediction = clf.predict(input_data)[0]
+        label = "Vaccine Hesitant (Cluster 1)" if prediction == 1 else "Vaccine Confident (Cluster 0)"
+        return {"prediction": label}
+
     except Exception as e:
+        import traceback
+        traceback.print_exc()
         return {"error": str(e)}
