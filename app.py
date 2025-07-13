@@ -22,18 +22,15 @@ def predict(request: Request,
             marital_status: str = Form(...),
             place: str = Form(...),
             edu: int = Form(...),
-            qua: int = Form(...),
             job: int = Form(...),
             jobst: int = Form(...),
             child: int = Form(...)):
     try:
-        row = [[
-            age,
-            le_sex.transform([sex])[0],
-            le_marital.transform([marital_status])[0],
-            le_place.transform([place])[0],
-            edu, qua, job, jobst, child
-        ]]
+        row = [[age,
+                le_sex.transform([sex])[0],
+                le_marital.transform([marital_status])[0],
+                le_place.transform([place])[0],
+                edu, job, jobst, child]]
         pred = clf.predict(row)[0]
         if pred == 1:
             result = "Vaccine Hesitant"
@@ -42,7 +39,7 @@ def predict(request: Request,
                        "Kindly vaccinate your child or visit the nearest healthcare center for more information.")
         else:
             result = "Vaccine Compliant"
-            message = ("✅ Thanks for being compliant. You are helping the society live a healthier life by protecting "
+            message = ("✅ Thanks for being compliant. You are helping society live a healthier life by protecting "
                        "your kids and loved ones.")
         return templates.TemplateResponse("index.html",
                                           {"request": request, "result": result, "message": message})
