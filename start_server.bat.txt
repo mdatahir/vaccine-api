@@ -1,0 +1,5 @@
+@echo off
+cd /d D:\Research\Abu sufiyan\Data analysis\vaccine_hesitancy_package
+echo Starting FastAPI server...
+uvicorn app:app --reload
+pause

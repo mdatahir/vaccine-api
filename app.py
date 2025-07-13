@@ -1,57 +1,51 @@
-from fastapi import FastAPI
-from pydantic import BaseModel
+from fastapi import FastAPI, Request, Form
+from fastapi.responses import HTMLResponse
+from fastapi.templating import Jinja2Templates
 import joblib
 
-app = FastAPI(
-    title="Vaccine Hesitancy Predictor by Tahir",
-    description="A FastAPI app to predict vaccine hesitancy based on demographic inputs.",
-    version="1.0"
-)
+app = FastAPI()
+templates = Jinja2Templates(directory="templates")
 
-# Define input schema
-class PredictionInput(BaseModel):
-    age: int
-    sex: str
-    marital_status: str
-    place: str
-    edu: int
-    qua: int
-    job: int
-    jobst: int
-    child: int
-
-# Load model and encoders
 clf = joblib.load("vaccine_model.pkl")
 le_sex = joblib.load("le_sex.pkl")
 le_marital = joblib.load("le_marital.pkl")
 le_place = joblib.load("le_place.pkl")
 
-@app.get("/")
-def read_root():
-    return {"message": "Vaccine Hesitancy Predictor API by Tahir is up and running."}
+@app.get("/", response_class=HTMLResponse)
+def read_form(request: Request):
+    return templates.TemplateResponse("form.html", {"request": request})
 
-@app.post("/predict")
-def predict(input: PredictionInput):
+@app.post("/predict", response_class=HTMLResponse)
+def predict(request: Request,
+            age: int = Form(...),
+            sex: str = Form(...),
+            marital_status: str = Form(...),
+            place: str = Form(...),
+            edu: int = Form(...),
+            qua: int = Form(...),
+            job: int = Form(...),
+            jobst: int = Form(...),
+            child: int = Form(...)):
     try:
-        # Prepare input data
-        input_data = [[
-            input.age,
-            le_sex.transform([input.sex])[0],
-            le_marital.transform([input.marital_status])[0],
-            le_place.transform([input.place])[0],
-            input.edu,
-            input.qua,
-            input.job,
-            input.jobst,
-            input.child
-        ]]
-
-        # Predict
-        prediction = clf.predict(input_data)[0]
-        label = "Vaccine Hesitant (Cluster 1)" if prediction == 1 else "Vaccine Confident (Cluster 0)"
-        return {"prediction": label}
-
+        row = [[age,
+                le_sex.transform([sex])[0],
+                le_marital.transform([marital_status])[0],
+                le_place.transform([place])[0],
+                edu, qua, job, jobst, child]]
+        pred = clf.predict(row)[0]
+        if pred == 1:
+            result = "Vaccine Hesitant"
+            message = ("⚠️ Vaccine prevents life-threatening diseases. "
+                       "Your hesitancy is dangerous for your loved ones. "
+                       "Kindly vaccinate your child or visit the nearest healthcare center for more information.")
+        else:
+            result = "Vaccine Compliant"
+            message = ("✅ Thanks for being compliant. You are helping the society live a healthier life by protecting "
+                       "your kids and loved ones.")
+        return templates.TemplateResponse("form.html",
+                                          {"request": request, "result": result, "message": message})
     except Exception as e:
         import traceback
         traceback.print_exc()
-        return {"error": str(e)}
+        return templates.TemplateResponse("form.html",
+                                          {"request": request, "result": "Error", "message": str(e)})
