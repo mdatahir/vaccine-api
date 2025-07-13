@@ -2,14 +2,13 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 import joblib
 
-# Load trained model and encoders
+app = FastAPI()
+
+# Load model & encoders
 clf = joblib.load("vaccine_model.pkl")
 le_sex = joblib.load("le_sex.pkl")
 le_marital = joblib.load("le_marital.pkl")
 le_place = joblib.load("le_place.pkl")
-
-# Create FastAPI app
-app = FastAPI()
 
 class UserInput(BaseModel):
     age: int
@@ -22,20 +21,23 @@ class UserInput(BaseModel):
     jobst: int
     child: int
 
+@app.get("/")
+def read_root():
+    return {"message": "Vaccine Hesitancy Prediction API running ✅"}
+
 @app.post("/predict")
-def predict(input: UserInput):
-    # Encode categorical inputs
-    sex_enc = le_sex.transform([input.sex.capitalize()])[0]
-    marital_enc = le_marital.transform([input.marital_status.capitalize()])[0]
-    place_enc = le_place.transform([input.place.capitalize()])[0]
-
-    # Create feature vector
-    X = [[
-        input.age, sex_enc, marital_enc, place_enc,
-        input.edu, input.qua, input.job, input.jobst, input.child
+def predict(data: UserInput):
+    row = [[
+        data.age,
+        le_sex.transform([data.sex])[0],
+        le_marital.transform([data.marital_status])[0],
+        le_place.transform([data.place])[0],
+        data.edu,
+        data.qua,
+        data.job,
+        data.jobst,
+        data.child
     ]]
-
-    pred = clf.predict(X)[0]
+    pred = clf.predict(row)[0]
     result = "Vaccine Hesitant" if pred == 1 else "Vaccine Confident"
-
     return {"prediction": result}
