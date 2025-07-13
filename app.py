@@ -21,7 +21,8 @@ def predict(request: Request,
             sex: str = Form(...),
             marital_status: str = Form(...),
             place: str = Form(...),
-            edu: int = Form(...),
+            education: int = Form(...),   # ✅ education instead of edu
+            qualification: str = Form(...),
             job: int = Form(...),
             jobst: int = Form(...),
             child: int = Form(...)):
@@ -39,7 +40,7 @@ def predict(request: Request,
                        "Kindly vaccinate your child or visit the nearest healthcare center for more information.")
         else:
             result = "Vaccine Compliant"
-            message = ("✅ Thanks for being compliant. You are helping society live a healthier life by protecting "
+            message = ("✅ Thanks for being compliant. You are helping the society live a healthier life by protecting "
                        "your kids and loved ones.")
         return templates.TemplateResponse("index.html",
                                           {"request": request, "result": result, "message": message})

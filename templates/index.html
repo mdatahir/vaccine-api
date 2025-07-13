@@ -1,38 +1,37 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
     <title>Vaccine Hesitancy Predictor</title>
 </head>
 <body>
     <h2>Vaccine Hesitancy Predictor</h2>
     <form method="post" action="/predict">
         <label>Age:</label>
-        <input type="number" name="age" required><br><br>
+        <input type="number" name="age" required><br>
 
         <label>Sex:</label>
         <select name="sex" required>
             <option value="Male">Male</option>
             <option value="Female">Female</option>
-        </select><br><br>
+        </select><br>
 
         <label>Marital Status:</label>
         <select name="marital_status" required>
             <option value="Single">Single</option>
             <option value="Married">Married</option>
-        </select><br><br>
+        </select><br>
 
         <label>Place:</label>
         <select name="place" required>
             <option value="Urban">Urban</option>
             <option value="Rural">Rural</option>
-        </select><br><br>
+        </select><br>
 
-        <label>Education:</label>
+        <label>Education (1=Yes, 2=No):</label>
         <select name="education" required>
             <option value="1">Yes</option>
             <option value="2">No</option>
-        </select><br><br>
+        </select><br>
 
         <label>Qualification:</label>
         <select name="qualification" required>
@@ -40,36 +39,36 @@
             <option value="2">Secondary</option>
             <option value="3">Higher Secondary</option>
             <option value="4">Tertiary</option>
-        </select><br><br>
+        </select><br>
 
         <label>Job:</label>
         <select name="job" required>
             <option value="1">Daily Wager</option>
             <option value="2">Housewife</option>
             <option value="3">Student</option>
-            <option value="4">Professional (Manager or higher)</option>
-            <option value="5">Professional (Junior/Clerk)</option>
+            <option value="4">Professional (Senior)</option>
+            <option value="5">Professional (Junior)</option>
             <option value="6">Business</option>
-        </select><br><br>
+        </select><br>
 
         <label>Job Status:</label>
         <select name="jobst" required>
             <option value="1">Working</option>
-            <option value="2">Retired / Not Working</option>
-        </select><br><br>
+            <option value="2">Retired/Not Working</option>
+        </select><br>
 
-        <label>Number of Children:</label>
+        <label>Children:</label>
         <select name="child" required>
             <option value="1">1</option>
             <option value="2">2</option>
             <option value="3">More than 2</option>
-        </select><br><br>
+        </select><br>
 
         <button type="submit">Predict</button>
     </form>
 
     {% if result %}
-        <h3>Result: {{ result }}</h3>
+        <h3>{{ result }}</h3>
         <p>{{ message }}</p>
     {% endif %}
 </body>
