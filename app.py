@@ -30,7 +30,7 @@ def predict(request: Request,
                 le_sex.transform([sex])[0],
                 le_marital.transform([marital_status])[0],
                 le_place.transform([place])[0],
-                edu, job, jobst, child]]
+                education, qualification, job, jobst, child]]
         pred = clf.predict(row)[0]
         if pred == 1:
             result = "Vaccine Hesitant"
